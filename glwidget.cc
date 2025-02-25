@@ -281,6 +281,16 @@ bool GLWidget::LoadColorMap(const QString &filename)
     //Configure the texture with identifier color_map_. Take advantage of LoadImage("path", GL_TEXTURE_2D).
     //Remember to configure the texture parameters.
     bool res;
+
+    glBindTexture(GL_TEXTURE_2D, color_map_);
+    res = LoadImage(filename.toStdString(), GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
     //TODO END
     update();
     return res;
@@ -293,6 +303,17 @@ bool GLWidget::LoadRoughnessMap(const QString &filename)
     //Configure the texture with identifier roughness_map_. Take advantage of LoadImage("path", GL_TEXTURE_2D)
     //Remember to configure the texture parameters.
     bool res;
+
+    glBindTexture(GL_TEXTURE_2D, roughness_map_);
+    res = LoadImage(filename.toStdString(), GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+
     //TODO END
     update();
     return res;
@@ -304,6 +325,16 @@ bool GLWidget::LoadMetalnessMap(const QString &filename)
     //Configure the texture with identifier metalness_map_. Take advantage of LoadImage("path", GL_TEXTURE_2D)
     //Remember to configure the texture parameters.
     bool res;
+
+    glBindTexture(GL_TEXTURE_2D, metalness_map_);
+    res = LoadImage(filename.toStdString(), GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
     //TODO END
     update();
     return res;
@@ -473,24 +504,25 @@ void GLWidget::paintGL ()
             glUniform1i(diffuse_map_location, 1);
 
             //TODO(students): active texture location for the following textures:
-            // //Texture unit 3 color_map_
-            // glActiveTexture(GL_TEXTURE2);
-            // glBindTexture(GL_TEXTURE_CUBE_MAP, color_map_);
-            // glUniform1i(diffuse_map_location, 2);
+           
+            //Texture unit 3 color_map_
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, color_map_);
+            glUniform1i(color_map_location, 2);
 
-            // //Texture unit 4 roughness_map_
-            // glActiveTexture(GL_TEXTURE3);
-            // glBindTexture(GL_TEXTURE_CUBE_MAP, roughness_map_);
-            // glUniform1i(diffuse_map_location, 3);
+            //Texture unit 4 roughness_map_
+            glActiveTexture(GL_TEXTURE3);
+            glBindTexture(GL_TEXTURE_2D, roughness_map_);
+            glUniform1i(roughness_map_location, 3);
 
-            // //Texture unit 5 metalness_map_
-            // glActiveTexture(GL_TEXTURE4);
-            // glBindTexture(GL_TEXTURE_CUBE_MAP, metalness_map_);
-            // glUniform1i(diffuse_map_location, 4);
+            //Texture unit 5 metalness_map_
+            glActiveTexture(GL_TEXTURE4);
+            glBindTexture(GL_TEXTURE_2D, metalness_map_);
+            glUniform1i(metalness_map_location, 4);
 
             //TODO END
 
-            glUniform1i(current_text_location, currentTexture_);
+            glUniform1i(current_text_location, 2 + currentTexture_);
             glUniform3f(fresnel_location, fresnel_[0], fresnel_[1], fresnel_[2]);
             glUniform3f(light_location, 10, 0, 0);
             glUniform1f(roughness_location, roughness_);
