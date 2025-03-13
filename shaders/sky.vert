@@ -11,5 +11,12 @@ uniform mat4 projection;
 
 void main(void)  {
     TexCoords = vert; 
-    gl_Position = projection * view * vec4(vert * 2, 1.0);
+
+    // Remove the translation factor from the view matrix
+    mat4 view_no_translation = view;
+    view_no_translation[3][0] = 0.0;
+    view_no_translation[3][1] = 0.0;
+    view_no_translation[3][2] = 0.0;
+
+    gl_Position = (projection * view_no_translation * vec4(vert, 1.0)).xyww;
 }

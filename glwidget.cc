@@ -284,7 +284,6 @@ bool GLWidget::LoadColorMap(const QString &filename)
 
     glBindTexture(GL_TEXTURE_2D, color_map_);
     res = LoadImage(filename.toStdString(), GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
     
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -562,8 +561,11 @@ void GLWidget::paintGL ()
                 // TODO(students): implement the draw call of the sky box
 
                 glBindVertexArray(VAO_sky);
+                glDepthFunc(GL_LEQUAL);
                 glDrawElements(GL_TRIANGLES, skyFaces_.size(), GL_UNSIGNED_INT, (GLvoid*)0);
                 glBindVertexArray(0);
+                glDepthFunc(GL_LESS);
+
                 
                 // TODO END.
             }

@@ -25,7 +25,7 @@ uniform vec4 lightSpecular = vec4(0.5, 0.5, 0.5, 1.0);
 void main (void) {
     vec3 wLight = vec3(view * vec4(light, 1.0));
     
-    vec3 N = normal_matrix * vNormal;
+    vec3 N = vNormal;
     vec3 L = wLight - vPos;
     vec3 V = -vPos;
 
@@ -33,7 +33,6 @@ void main (void) {
     V = normalize(V); 
     L = normalize(L);
 
-    //vec3 R = 2*(max(dot(N,L), 0.0))*N - L;
     vec3 R = reflect(-L, N); 
 
     float NdotL = max(dot(N,L), 0.0);

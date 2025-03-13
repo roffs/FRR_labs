@@ -11,9 +11,11 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+uniform mat3 normal_matrix;
+
 void main(void)  {
 
-    vNormal = normal;
+    vNormal = normalize(normal_matrix  * normal);
     vPos = (view * model * vec4(vert, 1.0)).xyz;
 
     gl_Position = projection * view * model * vec4(vert, 1.0);
