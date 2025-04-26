@@ -12,6 +12,9 @@ uniform sampler2D color_map;
 uniform sampler2D roughness_map;
 uniform sampler2D metalness_map;
 
+uniform float metalness;
+uniform float roughness;
+
 out vec4 frag_color;
 
 const float PI = 3.141592;
@@ -37,7 +40,7 @@ float smith_g(float NdotV, float NdotL, float k) {
 }
 
 vec3 schlick_f(vec3 f0, float LdotH) {
-    vec3 result = f0 + (1 - f0)*pow(1-LdotH, 5);
+    vec3 result = f0 + (1.0 - f0)*pow(clamp(1.0 - LdotH, 0.0, 1.0), 5);
     return result;
 }
 
@@ -55,6 +58,7 @@ void main(void) {
     float LdotH = max(dot(L,H), 0.0);
 
     vec3 albedo = texture(color_map, vTexCoord).rgb;
+    //albedo = vec3(0.8, 0.8, 0.0);
     float roughness = texture(roughness_map, vTexCoord).x;
     float metalness = texture(metalness_map, vTexCoord).x;
 
@@ -69,7 +73,7 @@ void main(void) {
 
 
     // COMPUTE FRESNEL REFLECTANCE
-    vec3 F0 = fresnel;
+    vec3 F0 = mix(fresnel, albedo, metalness);
     vec3 F = schlick_f(F0, LdotH);
 
 
