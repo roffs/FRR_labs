@@ -6,7 +6,7 @@ layout (location = 2) in vec2 texCoord;
 
 
 out vec3 worldPos;
-out vec3 worldNormal; 
+out vec3 worldNormal;
 out vec2 vTexCoord;
 
 uniform mat4 model;

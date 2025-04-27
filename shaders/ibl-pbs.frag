@@ -24,13 +24,30 @@ vec3 schlick_f(vec3 f0, float NdotV) {
     return result;
 }
 
-void main(void) {    
+float schlick_ggx_g(float Ndot, float k) {
+    float result = Ndot / (Ndot*(1-k) + k);
+    return result;
+}
+
+float smith_g(float NdotV, float NdotL, float k) {
+    float masking = schlick_ggx_g(NdotV, k);
+    float shadowing = schlick_ggx_g(NdotL, k);
+
+    return masking * shadowing;
+}
+
+float implicit_g(float NdotL, float NdotV) {
+    return NdotL * NdotV;
+}
+
+
+void main(void) {
     vec3 viewPos = inverse(view)[3].xyz;
-    
+
     vec3 N = normalize(worldNormal);
     vec3 V = normalize(viewPos - worldPos);
     vec3 R = reflect(-V, N);
-    
+
     float NdotV = max(dot(N,V), 0.0);
 
     vec3 albedo = texture(color_map, vTexCoord).rgb;
@@ -39,6 +56,10 @@ void main(void) {
 
     float gamma = 2.2;
 
+
+    // COMPUTE GEOMETRY FUNCTION
+    // float k_ibl = pow(roughness, 2) / 2.0;
+    float G = implicit_g(NdotV, NdotV);
 
     // COMPUTE FRESNEL REFLECTANCE
     vec3 F0 = mix(fresnel, albedo, metalness);
@@ -52,24 +73,22 @@ void main(void) {
 
 
     // COMPUTE DIFUSE COMPONENT
-    vec3 irradiance = texture(diffuse_map, N).rgb; 
+    vec3 irradiance = texture(diffuse_map, N).rgb;
     vec3 diffuse = kd * albedo * irradiance;
 
 
     // COMPUTE SPECULAR COMPONENT
-    vec3 spec_irradiance = textureLod(specular_map, R, roughness * 6).rgb;
-
-    vec3 fCookTorrance = F * spec_irradiance / 4;
-    vec3 specular = ks * fCookTorrance;
+    vec3 prefilteredColor = textureLod(specular_map, R, roughness * 6).rgb;
+    vec3 fCookTorrance = F * G * prefilteredColor / (4.0 * NdotV * NdotV);
+    vec3 specular = fCookTorrance;
 
 
     // COMPUTE PBR RESULT
-    vec3 result = diffuse + specular;
+    vec3 color = (diffuse + specular);
 
-    
     // APPLY GAMMA CORRECTION
-    vec3 final_color = pow(result, vec3(1.0/gamma));
+    vec3 final_color = pow(color, vec3(1.0/gamma));
 
     frag_color = vec4(final_color, 1.0);
-    
+
 }

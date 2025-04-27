@@ -88,12 +88,12 @@ void main(void) {
     vec3 diffuse = kd * fLambert;
 
     // COMPUTE SPECULAR COMPONENT
-    vec3 fCookTorrance = F * G * NDF / (4 * NdotL * NdotV);
-    vec3 specular = ks * fCookTorrance;
+    vec3 fCookTorrance = ks * F * G * NDF / (4 * NdotL * NdotV);
+    vec3 specular = fCookTorrance;
 
 
     // COMPUTE PBR RESULT
-    vec3 result = vec3(diffuse + specular) * NdotL;
+    vec3 result = (diffuse + specular) * NdotL;
 
     
     // APPLY GAMMA CORRECTION
